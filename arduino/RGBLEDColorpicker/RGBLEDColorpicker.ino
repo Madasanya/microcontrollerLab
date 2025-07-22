@@ -5,7 +5,7 @@
 #define BLUE 3
 #define GREEN 5
 #define RED 6
-#define HASH 35
+#define ASCII_HASH 35
 #define HEX_LENGTH 7
 
 void setup()
@@ -40,7 +40,7 @@ int	isHexString(String input)
 {
   int ret = 1;
 
-  if (input[0] != HASH || ft_strlen(input) != HEX_LENGTH)
+  if (input[0] != ASCII_HASH || ft_strlen(input) != HEX_LENGTH)
     ret = 0;
 
   for (int i = 1; i < HEX_LENGTH && ret != 0; i++)
@@ -65,14 +65,13 @@ int getIndex(char c)
 
 int hexToInt(char first, char second)
 {
-  return (getIndex(first) * 16 + getIndex(second));
+  int baseSize = (sizeof(base)/sizeof(char));
+  return (getIndex(first) * pow(baseSize, 1) + getIndex(second) * pow(baseSize, 0));
 }
 
 // main loop
 void loop()
 {
-  #define delayTime 10 // fading time between colors
-
   if (Serial.available() > 0)
   {
     String hexCode = Serial.readString();
@@ -81,9 +80,10 @@ void loop()
     {
       Serial.print("Input ");
       Serial.print(hexCode);
-      Serial.println(" was not a hex format (#000000)");
-      redValue = 255;
+      Serial.println(" is not a hex format (#XXXXXX with X as 0 - 9 or A - F)");
+      redValue = 0;
       greenValue = 0;
+      blueValue = 0;
     }
     else
     { 
@@ -95,12 +95,7 @@ void loop()
       Serial.println(blueValue);
     }
   }
-
-
   analogWrite(RED, redValue);
   analogWrite(GREEN, greenValue);
   analogWrite(BLUE, blueValue);
-  delay(delayTime);
-
-
 }
