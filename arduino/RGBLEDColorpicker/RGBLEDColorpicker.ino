@@ -32,27 +32,40 @@ int	ft_strlen(String string)
 	len = 0;
 	while (string[len] != '\0')
 		len++;
+
 	return (len);
 }
 
-int	isHex(String input)
+int	isHexString(String input)
 {
   int ret = 1;
-  if (input[0] != HASH || ft_strlen(input) != HEX_LENGTH + 1)
+
+  if (input[0] != HASH || ft_strlen(input) != HEX_LENGTH)
     ret = 0;
-  for (int i = 1; i < HEX_LENGTH; i++)
+
+  for (int i = 1; i < HEX_LENGTH && ret != 0; i++)
   {
-    Serial.println("Test02");
-    Serial.println(input[i]);
-    if (!((input[i] > 47 && input[i] < 58) || (input[i] > 64 && input[i] < 71)))
-    {
-      Serial.println("Test03");
-      Serial.println(input[i]);
+    if (!(isHexadecimalDigit(input[i])))
       ret = 0;
-    }
   }
-  Serial.println(ret);
-	return ret;
+
+	return (ret);
+}
+
+int getIndex(char c)
+{
+	int	idx;
+
+	idx = 0;
+	while (base[idx] != c)
+		idx++;
+
+	return (idx);
+}
+
+int hexToInt(char first, char second)
+{
+  return (getIndex(first) * 16 + getIndex(second));
 }
 
 // main loop
@@ -63,7 +76,8 @@ void loop()
   if (Serial.available() > 0)
   {
     String hexCode = Serial.readString();
-    if (!isHex(hexCode))
+    hexCode.trim();
+    if (!isHexString(hexCode))
     {
       Serial.print("Input ");
       Serial.print(hexCode);
@@ -72,9 +86,13 @@ void loop()
       greenValue = 0;
     }
     else
-    {
-      greenValue = 255;
-      redValue = 0;
+    { 
+      redValue = hexToInt(hexCode[1], hexCode[2]);
+      greenValue = hexToInt(hexCode[3], hexCode[4]);
+      blueValue = hexToInt(hexCode[5], hexCode[6]);
+      Serial.println(redValue);
+      Serial.println(greenValue);
+      Serial.println(blueValue);
     }
   }
 
